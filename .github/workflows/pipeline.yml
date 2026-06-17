@@ -25,8 +25,12 @@ jobs:
         run: pip install requests numpy pandas geopandas
       - name: Aggiorna qualità aria
         run: python terrawatch/pipeline/run.py --layer air
+      - name: Copia dati nel sito
+        run: |
+          cp terrawatch/data/current/air_quality.json terrawatch/site/data/
+          cp terrawatch/data/current/teri_full.json terrawatch/site/data/
       - name: Commit dati
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "data: update air quality"
-          file_pattern: "terrawatch/data/current/*.json"
+          file_pattern: "terrawatch/data/current/*.json terrawatch/site/data/*.json"
