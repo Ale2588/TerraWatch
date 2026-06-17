@@ -24,13 +24,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Debug struttura
+        run: ls -la && echo "---" && ls -la site/ || echo "site/ non trovata"
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "site/"
+          path: "site"
 
       - name: Deploy to GitHub Pages
         id: deployment
