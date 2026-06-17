@@ -234,9 +234,9 @@ def fetch_sentinel_indices(comuni: list[dict], output_path: Path) -> dict:
         # URL bande — Copernicus Data Space usa chiavi come "B04", "B08", "B03"
         # oppure nomi alternativi: controlla entrambi i pattern
         band_keys = {
-            "red":   ["B04", "red"],
-            "nir":   ["B08", "nir", "B8A"],
-            "green": ["B03", "green"],
+            "red":   ["B04_10m", "B04_20m", "B04", "red"],
+            "nir":   ["B08_10m", "B08_20m", "B08", "B8A_20m", "B8A", "nir"],
+            "green": ["B03_10m", "B03_20m", "B03", "green"],
         }
 
         band_urls = {}
