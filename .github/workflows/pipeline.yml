@@ -1,0 +1,39 @@
+name: TerraWatch Data Pipeline
+
+on:
+  schedule:
+    - cron: "0 0,6,12,18 * * *"
+  workflow_dispatch:
+    inputs:
+      layer:
+        description: "Layer da aggiornare"
+        required: false
+        default: "air"
+
+env:
+  AQICN_TOKEN: ${{ secrets.AQICN_TOKEN }}
+
+jobs:
+  update-air:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installa dipendenze
+        run: pip install requests
+
+      - name: Aggiorna qualità aria
+        run: python terrawatch/pipeline/run.py --layer air
+
+      - name: Commit dati
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "data: update air quality"
+          file_pattern: "terrawatch/data/current/*.json"
