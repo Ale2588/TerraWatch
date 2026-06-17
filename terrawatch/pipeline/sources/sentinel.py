@@ -21,7 +21,7 @@ from collections import defaultdict
 COPERNICUS_USER = os.environ.get("COPERNICUS_USER", "")
 COPERNICUS_PASS = os.environ.get("COPERNICUS_PASS", "")
 
-STAC_URL = "https://catalogue.dataspace.copernicus.eu/stac/collections/SENTINEL-2/items"
+STAC_URL = "https://stac.dataspace.copernicus.eu/v1/collections/sentinel-2-l2a/items"
 TOKEN_URL = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
 
 
