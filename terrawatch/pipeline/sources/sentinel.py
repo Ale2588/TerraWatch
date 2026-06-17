@@ -94,19 +94,27 @@ def find_scenes(bbox: list[float], date_from: str, date_to: str,
 # Download banda — FIX: scarica in tempfile, poi legge con rasterio
 # ---------------------------------------------------------------------------
 
+def s3_to_https(url: str) -> str:
+    """Converte URL s3://eodata/... in https://eodata.dataspace.copernicus.eu/..."""
+    if url.startswith("s3://eodata/"):
+        return "https://eodata.dataspace.copernicus.eu/" + url[len("s3://eodata/"):]
+    return url
+
+
 def download_band(asset_url: str, token: str) -> np.ndarray | None:
     """
-    Scarica una banda Sentinel-2 (GeoTIFF) via HTTP con Bearer token,
+    Scarica una banda Sentinel-2 (JP2/GeoTIFF) via HTTPS con Bearer token,
     la salva in un file temporaneo e la legge con rasterio.
+    Converte automaticamente URL s3:// in https://.
     Restituisce array numpy float32 o None in caso di errore.
     """
     try:
         import rasterio
 
-        headers = {"Authorization": f"Bearer {token}"}
+        # Converti s3:// → https://
+        asset_url = s3_to_https(asset_url)
 
-        # Alcuni URL del Copernicus Data Space richiedono redirect S3
-        # Seguiamo i redirect mantenendo l'header Authorization
+        headers = {"Authorization": f"Bearer {token}"}
         session = requests.Session()
         session.headers.update(headers)
 
