@@ -55,23 +55,35 @@ def get_access_token() -> str | None:
 def find_scenes(bbox: list[float], date_from: str, date_to: str,
                 max_cloud: int = 20) -> list[dict]:
     """
-    Query STAC per scene Sentinel-2 L2A.
+    Query STAC v1 per scene Sentinel-2 L2A.
     bbox: [lon_min, lat_min, lon_max, lat_max]
+    La collection è già nell'URL — niente parametro filter o collections.
+    Cloud cover filtrato lato client.
     """
     params = {
         "bbox": ",".join(map(str, bbox)),
         "datetime": f"{date_from}T00:00:00Z/{date_to}T23:59:59Z",
-        "collections": "SENTINEL-2",
-        "filter": f"s2:processing_level='L2A' AND eo:cloud_cover<{max_cloud}",
-        "limit": 10,
-        "sortby": "-datetime",
+        "limit": 20,
     }
 
     try:
         r = requests.get(STAC_URL, params=params, timeout=30)
         r.raise_for_status()
         features = r.json().get("features", [])
-        print(f"    Scene trovate: {len(features)}")
+
+        # Filtra cloud cover lato client
+        features = [
+            f for f in features
+            if (f.get("properties", {}).get("eo:cloud_cover") or 100) < max_cloud
+        ]
+
+        # Ordina per data decrescente (più recente prima)
+        features.sort(
+            key=lambda f: f.get("properties", {}).get("datetime", ""),
+            reverse=True,
+        )
+
+        print(f"    Scene trovate (cloud<{max_cloud}%): {len(features)}")
         return features
     except Exception as e:
         print(f"    ⚠️  STAC query error: {e}")
