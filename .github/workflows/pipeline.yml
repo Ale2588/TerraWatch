@@ -34,7 +34,6 @@ jobs:
         with:
           commit_message: "data: update air quality"
           file_pattern: "terrawatch/data/current/*.json terrawatch/site/data/*.json"
-          pull_before_commit: true
 
   update-sentinel:
     runs-on: ubuntu-latest
@@ -46,3 +45,17 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
+          python-version: "3.11"
+      - name: Installa dipendenze
+        run: pip install requests numpy rasterio
+      - name: Aggiorna Sentinel-2
+        run: python terrawatch/pipeline/run.py --layer sentinel
+      - name: Copia dati nel sito
+        run: |
+          cp terrawatch/data/current/sentinel.json terrawatch/site/data/
+          cp terrawatch/data/current/teri_full.json terrawatch/site/data/
+      - name: Commit dati
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "data: update sentinel-2 NDVI"
+          file_pattern: "terrawatch/data/current/
