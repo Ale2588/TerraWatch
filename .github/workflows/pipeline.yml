@@ -4,12 +4,10 @@ on:
     - cron: "0 0,6,12,18 * * *"
     - cron: "0 3 * * 1,4"
   workflow_dispatch:
-
 env:
   AQICN_TOKEN: ${{ secrets.AQICN_TOKEN }}
   COPERNICUS_USER: ${{ secrets.COPERNICUS_USER }}
   COPERNICUS_PASS: ${{ secrets.COPERNICUS_PASS }}
-
 jobs:
   update-air:
     runs-on: ubuntu-latest
@@ -34,7 +32,6 @@ jobs:
         with:
           commit_message: "data: update air quality"
           file_pattern: "terrawatch/data/current/*.json terrawatch/site/data/*.json"
-
   update-sentinel:
     runs-on: ubuntu-latest
     needs: update-air
@@ -58,4 +55,17 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "data: update sentinel-2 NDVI"
-          file_pattern: "terrawatch/data/current/
+          file_pattern: "terrawatch/data/current/*.json terrawatch/site/data/*.json"
+  deploy-pages:
+    runs-on: ubuntu-latest
+    needs: update-sentinel
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Deploy su GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./terrawatch/site
+          publish_branch: gh-pages
